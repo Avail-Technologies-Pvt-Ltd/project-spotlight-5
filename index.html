@@ -1,0 +1,1966 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftParcel | Delivery App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E6F0FF;
+            --secondary: #2A6DFF;
+            --accent: #00A86B;
+            --danger: #FF4757;
+            --warning: #FFA502;
+            --success: #2ED573;
+            --dark: #1E293B;
+            --gray-dark: #475569;
+            --gray: #94A3B8;
+            --gray-light: #E2E8F0;
+            --gray-extra-light: #F8FAFC;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            background-color: var(--gray-extra-light);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Clean White Navigation */
+        .app-header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 64px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .app-logo {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        /* Desktop Navigation */
+        .nav-desktop {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 0.5rem 0;
+            color: var(--gray-dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            border-radius: 1px;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Navigation Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            transition: background-color 0.2s;
+        }
+
+        .mobile-nav-toggle:hover {
+            background-color: var(--gray-extra-light);
+        }
+
+        /* Mobile Navigation */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .mobile-nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: var(--white);
+            z-index: 1000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-nav.active {
+            right: 0;
+        }
+
+        .mobile-nav-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-nav-close {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-dark);
+            border-radius: var(--radius-sm);
+            transition: background-color 0.2s;
+        }
+
+        .mobile-nav-close:hover {
+            background-color: var(--gray-extra-light);
+        }
+
+        .mobile-nav-content {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .mobile-nav-link:hover {
+            background-color: var(--gray-extra-light);
+        }
+
+        .mobile-nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .mobile-nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .app-main {
+            padding-top: 80px;
+            padding-bottom: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .app-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .app-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Elegant Cards */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--white);
+        }
+
+        .stat-icon.delivery { background-color: var(--primary); }
+        .stat-icon.success { background-color: var(--success); }
+        .stat-icon.cities { background-color: var(--secondary); }
+        .stat-icon.customers { background-color: var(--accent); }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        /* Package Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .option-card {
+            background: var(--white);
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .option-card i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        /* Payment Options */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .payment-card {
+            background: var(--white);
+            border: 2px solid var(--gray-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .payment-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .payment-card.selected {
+            border-color: var(--accent);
+            background-color: rgba(0, 168, 107, 0.05);
+        }
+
+        .payment-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-card.cash i { color: var(--accent); }
+        .payment-card.ecocash i { color: var(--primary); }
+        .payment-card.inbucks i { color: var(--secondary); }
+
+        /* Orders Grid */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .order-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .order-id {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .order-priority {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .priority-high { background: #FFE4E6; color: #DC2626; }
+        .priority-medium { background: #FEF3C7; color: #D97706; }
+        .priority-low { background: #D1FAE5; color: #059669; }
+
+        .order-route {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--gray-extra-light);
+            border-radius: var(--radius-sm);
+        }
+
+        .route-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        .route-line {
+            flex: 1;
+            height: 1px;
+            background: var(--gray-light);
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background-color: #26C46A;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Patterned Alerts */
+        .alert {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 300px;
+            max-width: 500px;
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .alert.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .alert.success {
+            border-left-color: var(--success);
+            background: linear-gradient(135deg, var(--white) 0%, #F0FFF9 100%);
+        }
+
+        .alert.error {
+            border-left-color: var(--danger);
+            background: linear-gradient(135deg, var(--white) 0%, #FFF5F5 100%);
+        }
+
+        .alert-pattern {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 60px;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0, 102, 255, 0.05) 10px,
+                rgba(0, 102, 255, 0.05) 20px
+            );
+            border-radius: 0 var(--radius) var(--radius) 0;
+            opacity: 0.3;
+        }
+
+        .alert.success .alert-pattern {
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(46, 213, 115, 0.05) 10px,
+                rgba(46, 213, 115, 0.05) 20px
+            );
+        }
+
+        .alert.error .alert-pattern {
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 71, 87, 0.05) 10px,
+                rgba(255, 71, 87, 0.05) 20px
+            );
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--white);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .alert.success .alert-icon {
+            background-color: var(--success);
+        }
+
+        .alert.error .alert-icon {
+            background-color: var(--danger);
+        }
+
+        .alert-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .alert-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--dark);
+        }
+
+        .alert-content p {
+            color: var(--gray-dark);
+            font-size: 0.95rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-light);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Steps */
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 3rem 0;
+        }
+
+        .steps-container:before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-light);
+            z-index: 1;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            background: var(--gray-light);
+            color: var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.2);
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        /* Footer */
+        .app-footer {
+            background: var(--white);
+            padding: 3rem 0 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--gray-light);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+
+        .app-footer.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--gray-light);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .nav-desktop {
+                display: none;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+            }
+
+            .app-main {
+                padding-top: 72px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid,
+            .form-grid,
+            .options-grid,
+            .payment-grid,
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-main {
+                padding: 72px 1rem 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .steps-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .steps-container:before {
+                display: none;
+            }
+
+            .step {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                text-align: left;
+            }
+
+            .step-number {
+                margin: 0;
+                flex-shrink: 0;
+            }
+        }
+
+        /* Scroll to top */
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <!-- Clean White Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <a href="#" class="app-brand" data-section="home">
+                <div class="app-logo">
+                    <i class="fas fa-box"></i>
+                </div>
+                SwiftParcel
+            </a>
+
+            <nav class="nav-desktop">
+                <a href="#" class="nav-link active" data-section="home">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" class="nav-link" data-section="book">
+                    <i class="fas fa-shipping-fast"></i> Book
+                </a>
+                <a href="#" class="nav-link" data-section="track">
+                    <i class="fas fa-map-marked-alt"></i> Track
+                </a>
+                <a href="#" class="nav-link" data-section="orders">
+                    <i class="fas fa-truck-loading"></i> Orders
+                </a>
+                <a href="#" class="nav-link" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </nav>
+
+            <button class="mobile-nav-toggle" id="mobileNavToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="app-brand" style="color: var(--primary);">
+                <div class="app-logo">
+                    <i class="fas fa-box"></i>
+                </div>
+                SwiftParcel
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-content">
+            <a href="#" class="mobile-nav-link active" data-section="home">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="book">
+                <i class="fas fa-shipping-fast"></i> Book Delivery
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="track">
+                <i class="fas fa-map-marked-alt"></i> Track Package
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="orders">
+                <i class="fas fa-truck-loading"></i> Available Orders
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="profile">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="#" class="mobile-nav-link" data-section="how-it-works">
+                <i class="fas fa-question-circle"></i> How It Works
+            </a>
+            <div style="padding: 1.5rem; border-top: 1px solid var(--gray-light); margin-top: 1rem;">
+                <a href="#" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;" data-section="login">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </a>
+                <a href="#" class="btn btn-outline" style="width: 100%;" data-section="register">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content - Only one section visible at a time -->
+    <main class="app-main">
+        <!-- Home Section -->
+        <section id="home" class="app-section active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-rocket"></i> Welcome to SwiftParcel
+                    </h2>
+                </div>
+                
+                <p style="color: var(--gray-dark); margin-bottom: 2rem; font-size: 1.1rem;">
+                    Experience premium package delivery with real-time tracking, multiple payment options, and transparent pricing.
+                </p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon delivery">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">24/7</h3>
+                            <p style="color: var(--gray);">Delivery Service</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon cities">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">150+</h3>
+                            <p style="color: var(--gray);">Cities Covered</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">98%</h3>
+                            <p style="color: var(--gray);">On-Time Rate</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon customers">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">50K+</h3>
+                            <p style="color: var(--gray);">Happy Customers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="#" class="btn btn-primary" data-section="book" style="padding: 1rem 2.5rem; font-size: 1.1rem;">
+                        <i class="fas fa-plus-circle"></i> Book New Delivery
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Activity
+                    </h2>
+                </div>
+                <div class="orders-grid">
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">SWIFT-789012</span>
+                            <span class="order-priority priority-high">URGENT</span>
+                        </div>
+                        <div class="order-route">
+                            <div class="route-dot"></div>
+                            <span>NYC</span>
+                            <div class="route-line"></div>
+                            <div class="route-dot"></div>
+                            <span>Boston</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" style="color: var(--primary);">In Transit</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Est. Delivery</span>
+                                <span class="detail-value">Tomorrow, 2 PM</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" style="width: 100%;">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Delivery Section -->
+        <section id="book" class="app-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-shipping-fast"></i> Book New Delivery
+                    </h2>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 33%"></div>
+                </div>
+
+                <div class="steps-container">
+                    <div class="step active" id="step1-indicator">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Package Details</strong>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Enter locations & package size</p>
+                        </div>
+                    </div>
+                    <div class="step" id="step2-indicator">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Payment Method</strong>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Choose payment option</p>
+                        </div>
+                    </div>
+                    <div class="step" id="step3-indicator">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Confirm Booking</strong>
+                            <p style="color: var(--gray); font-size: 0.9rem;">Review & submit</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Package Details -->
+                <div id="step1">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--dark);">Package Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Pickup Location *</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-map-marker-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                                <input type="text" class="form-control" id="pickupLocation" placeholder="Enter pickup address" style="padding-left: 3rem;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Delivery Location *</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-flag-checkered" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                                <input type="text" class="form-control" id="deliveryLocation" placeholder="Enter delivery address" style="padding-left: 3rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Package Size *</label>
+                        <div class="options-grid">
+                            <div class="option-card selected" data-size="small">
+                                <i class="fas fa-envelope"></i>
+                                <h4 style="margin-bottom: 0.5rem;">Small</h4>
+                                <p style="color: var(--gray); margin-bottom: 0.5rem;">Up to 1kg</p>
+                                <p style="color: var(--primary); font-weight: 700;">$8.99</p>
+                            </div>
+                            <div class="option-card" data-size="medium">
+                                <i class="fas fa-box"></i>
+                                <h4 style="margin-bottom: 0.5rem;">Medium</h4>
+                                <p style="color: var(--gray); margin-bottom: 0.5rem;">1-5kg</p>
+                                <p style="color: var(--primary); font-weight: 700;">$15.99</p>
+                            </div>
+                            <div class="option-card" data-size="large">
+                                <i class="fas fa-pallet"></i>
+                                <h4 style="margin-bottom: 0.5rem;">Large</h4>
+                                <p style="color: var(--gray); margin-bottom: 0.5rem;">5-20kg</p>
+                                <p style="color: var(--primary); font-weight: 700;">$29.99</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-primary" id="nextStep1" style="padding: 1rem 2.5rem;">
+                            Continue to Payment <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment Method -->
+                <div id="step2" class="hidden">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--dark);">Select Payment Method</h3>
+                    
+                    <div class="payment-grid">
+                        <div class="payment-card cash" data-method="cash">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <h4 style="margin-bottom: 0.5rem;">Cash on Delivery</h4>
+                            <p style="color: var(--gray);">Pay when package arrives</p>
+                        </div>
+                        <div class="payment-card ecocash selected" data-method="ecocash">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4 style="margin-bottom: 0.5rem;">EcoCash</h4>
+                            <p style="color: var(--gray);">Mobile money payment</p>
+                        </div>
+                        <div class="payment-card inbucks" data-method="inbucks">
+                            <i class="fas fa-wallet"></i>
+                            <h4 style="margin-bottom: 0.5rem;">InBucks</h4>
+                            <p style="color: var(--gray);">Digital wallet payment</p>
+                        </div>
+                    </div>
+
+                    <div id="ecocashDetails" class="mt-3">
+                        <div class="form-group">
+                            <label class="form-label">EcoCash Number *</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-phone" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                                <input type="tel" class="form-control" placeholder="077 123 4567" style="padding-left: 3rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="inbucksDetails" class="mt-3 hidden">
+                        <div class="form-group">
+                            <label class="form-label">InBucks Username *</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                                <input type="text" class="form-control" placeholder="Enter username" style="padding-left: 3rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-outline" id="prevStep2" style="margin-right: 1rem; padding: 1rem 2rem;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn btn-primary" id="nextStep2" style="padding: 1rem 2rem;">
+                            Review & Confirm <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="step3" class="hidden">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--dark);">Review & Confirm Booking</h3>
+                    
+                    <div class="card" style="background: var(--gray-extra-light); margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-light);">
+                            <span style="color: var(--gray-dark);">Pickup Location:</span>
+                            <strong id="reviewPickup">-</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-light);">
+                            <span style="color: var(--gray-dark);">Delivery Location:</span>
+                            <strong id="reviewDelivery">-</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-light);">
+                            <span style="color: var(--gray-dark);">Package Size:</span>
+                            <strong id="reviewPackage">Medium</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-light);">
+                            <span style="color: var(--gray-dark);">Payment Method:</span>
+                            <strong id="reviewPayment">EcoCash</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 1rem;">
+                            <span style="color: var(--gray-dark); font-size: 1.1rem;">Total Amount:</span>
+                            <strong style="color: var(--primary); font-size: 1.5rem;" id="reviewAmount">$15.99</strong>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="btn btn-outline" id="prevStep3" style="margin-right: 1rem; padding: 1rem 2rem;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn btn-primary" id="confirmBooking" style="padding: 1rem 2rem;">
+                            <i class="fas fa-check-circle"></i> Confirm & Pay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Track Package Section -->
+        <section id="track" class="app-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-map-marked-alt"></i> Track Package
+                    </h2>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="flex: 1; position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                        <input type="text" class="form-control" id="trackingNumber" placeholder="Enter tracking number (e.g. SWIFT-789012)" value="SWIFT-789012" style="padding-left: 3rem;">
+                    </div>
+                    <button class="btn btn-primary" id="trackBtn" style="padding: 0 2rem;">
+                        <i class="fas fa-search"></i> Track
+                    </button>
+                </div>
+
+                <div class="card" style="background: var(--primary-light); border-color: var(--primary); margin-bottom: 2rem;">
+                    <div style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div>
+                                <p style="color: var(--primary); font-size: 0.9rem;">Tracking ID</p>
+                                <h3 style="font-size: 1.5rem;" id="trackingId">SWIFT-789012</h3>
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="color: var(--primary); font-size: 0.9rem;">Status</p>
+                                <h3 style="font-size: 1.5rem;" id="packageStatus">In Transit</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tracking Timeline -->
+                <div style="position: relative; padding-left: 2rem; margin-top: 2rem;">
+                    <div style="position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--gray-light);"></div>
+                    
+                    <div style="position: relative; margin-bottom: 2rem;">
+                        <div style="position: absolute; left: -20px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--success); border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--success);"></div>
+                        <div style="padding-left: 1.5rem;">
+                            <h4 style="margin-bottom: 0.25rem;">Order Confirmed</h4>
+                            <p style="color: var(--gray); margin-bottom: 0.25rem;">Your order has been received and confirmed</p>
+                            <small style="color: var(--gray);">Today, 9:30 AM</small>
+                        </div>
+                    </div>
+
+                    <div style="position: relative; margin-bottom: 2rem;">
+                        <div style="position: absolute; left: -20px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--success); border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--success);"></div>
+                        <div style="padding-left: 1.5rem;">
+                            <h4 style="margin-bottom: 0.25rem;">Package Picked Up</h4>
+                            <p style="color: var(--gray); margin-bottom: 0.25rem;">Driver has collected your package</p>
+                            <small style="color: var(--gray);">Today, 11:45 AM</small>
+                        </div>
+                    </div>
+
+                    <div style="position: relative; margin-bottom: 2rem;">
+                        <div style="position: absolute; left: -20px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); border: 3px solid var(--white); box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.2);"></div>
+                        <div style="padding-left: 1.5rem;">
+                            <h4 style="margin-bottom: 0.25rem;">In Transit</h4>
+                            <p style="color: var(--gray); margin-bottom: 0.25rem;">Package is on the way to delivery location</p>
+                            <small style="color: var(--gray);">Today, 12:30 PM</small>
+                        </div>
+                    </div>
+
+                    <div style="position: relative; margin-bottom: 2rem; opacity: 0.7;">
+                        <div style="position: absolute; left: -20px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--gray-light); border: 3px solid var(--white);"></div>
+                        <div style="padding-left: 1.5rem;">
+                            <h4 style="margin-bottom: 0.25rem;">Out for Delivery</h4>
+                            <p style="color: var(--gray); margin-bottom: 0.25rem;">Package will be delivered soon</p>
+                            <small style="color: var(--gray);">Estimated: Tomorrow, 1:00 PM</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="app-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-truck-loading"></i> Available Orders
+                    </h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="orders-grid">
+                    <!-- Order 1 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">SWIFT-987654</span>
+                            <span class="order-priority priority-high">URGENT</span>
+                        </div>
+                        <div class="order-route">
+                            <div class="route-dot"></div>
+                            <span>Harare CBD</span>
+                            <div class="route-line"></div>
+                            <div class="route-dot"></div>
+                            <span>Chitungwiza</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Package Size</span>
+                                <span class="detail-value">Medium (3kg)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Distance</span>
+                                <span class="detail-value">25 km</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Payment</span>
+                                <span class="detail-value">EcoCash</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Earnings</span>
+                                <span class="detail-value" style="color: var(--success);">$18.50</span>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline" style="flex: 1;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-success accept-order" style="flex: 1;" data-order="SWIFT-987654">
+                                <i class="fas fa-check"></i> Accept
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Order 2 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">SWIFT-654321</span>
+                            <span class="order-priority priority-medium">MEDIUM</span>
+                        </div>
+                        <div class="order-route">
+                            <div class="route-dot"></div>
+                            <span>Bulawayo</span>
+                            <div class="route-line"></div>
+                            <div class="route-dot"></div>
+                            <span>Victoria Falls</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Package Size</span>
+                                <span class="detail-value">Large (15kg)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Distance</span>
+                                <span class="detail-value">440 km</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Payment</span>
+                                <span class="detail-value">Cash</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Earnings</span>
+                                <span class="detail-value" style="color: var(--success);">$85.00</span>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline" style="flex: 1;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-success accept-order" style="flex: 1;" data-order="SWIFT-654321">
+                                <i class="fas fa-check"></i> Accept
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Order 3 -->
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">SWIFT-321987</span>
+                            <span class="order-priority priority-low">LOW</span>
+                        </div>
+                        <div class="order-route">
+                            <div class="route-dot"></div>
+                            <span>Mutare</span>
+                            <div class="route-line"></div>
+                            <div class="route-dot"></div>
+                            <span>Masvingo</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Package Size</span>
+                                <span class="detail-value">Small (0.5kg)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Distance</span>
+                                <span class="detail-value">180 km</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Payment</span>
+                                <span class="detail-value">InBucks</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Earnings</span>
+                                <span class="detail-value" style="color: var(--success);">$32.50</span>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="btn btn-outline" style="flex: 1;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-success accept-order" style="flex: 1;" data-order="SWIFT-321987">
+                                <i class="fas fa-check"></i> Accept
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="app-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-line"></i> Dashboard Overview
+                    </h2>
+                    <select class="form-control" style="width: auto; padding: 0.5rem 1rem;">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 90 Days</option>
+                    </select>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon delivery">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">12</h3>
+                            <p style="color: var(--gray);">Total Deliveries</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">10</h3>
+                            <p style="color: var(--gray);">Completed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon cities">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">1</h3>
+                            <p style="color: var(--gray);">In Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon customers">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.75rem; margin-bottom: 0.25rem;">$1,245</h3>
+                            <p style="color: var(--gray);">Total Spent</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Deliveries
+                    </h2>
+                </div>
+                <div class="orders-grid">
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">SWIFT-789012</span>
+                            <span class="order-priority priority-high">ACTIVE</span>
+                        </div>
+                        <div class="order-route">
+                            <div class="route-dot"></div>
+                            <span>NYC</span>
+                            <div class="route-line"></div>
+                            <div class="route-dot"></div>
+                            <span>Boston</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" style="color: var(--primary);">In Transit</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Est. Delivery</span>
+                                <span class="detail-value">Tomorrow, 2 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional sections would go here -->
+        <!-- (Login, Register, Profile, How It Works, Terms sections are available but hidden by default) -->
+
+    </main>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Footer (Hidden by default, appears on scroll) -->
+    <footer class="app-footer" id="appFooter">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>SwiftParcel</h3>
+                <p style="color: var(--gray); margin-top: 0.5rem;">
+                    Premium package delivery with real-time tracking and secure payments.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Services</h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-section="book"><i class="fas fa-shipping-fast"></i> Book Delivery</a></li>
+                    <li><a href="#" data-section="track"><i class="fas fa-map-marked-alt"></i> Track Package</a></li>
+                    <li><a href="#" data-section="orders"><i class="fas fa-truck-loading"></i> Available Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <ul class="footer-links">
+                    <li><a href="#" data-section="how-it-works"><i class="fas fa-question-circle"></i> How It Works</a></li>
+                    <li><a href="#" data-section="terms"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
+                    <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-envelope"></i> support@swiftparcel.com</a></li>
+                    <li><a href="#"><i class="fas fa-phone"></i> +1 (800) 123-4567</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Delivery St, NYC</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 SwiftParcel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Patterned Alert -->
+    <div class="alert" id="alert">
+        <div class="alert-pattern"></div>
+        <div class="alert-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="alert-content">
+            <strong id="alertTitle">Success</strong>
+            <p id="alertMessage">Operation completed successfully</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const mobileNav = document.getElementById('mobileNav');
+        const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+        const mobileNavClose = document.getElementById('mobileNavClose');
+        const navLinks = document.querySelectorAll('a[data-section]');
+        const sections = document.querySelectorAll('.app-section');
+        const appFooter = document.getElementById('appFooter');
+        const scrollTopBtn = document.getElementById('scrollTop');
+        const alert = document.getElementById('alert');
+
+        // State
+        let currentBookingStep = 1;
+        let selectedPackage = 'small';
+        let selectedPayment = 'ecocash';
+        let bookingData = {};
+
+        // Mobile Navigation
+        function toggleMobileNav() {
+            mobileNav.classList.toggle('active');
+            mobileNavOverlay.classList.toggle('active');
+            document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        mobileNavToggle.addEventListener('click', toggleMobileNav);
+        mobileNavClose.addEventListener('click', toggleMobileNav);
+        mobileNavOverlay.addEventListener('click', toggleMobileNav);
+
+        // Section Navigation
+        function switchSection(sectionId) {
+            // Hide all sections
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update active nav links
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Close mobile nav if open
+            if (mobileNav.classList.contains('active')) {
+                toggleMobileNav();
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                switchSection(sectionId);
+            });
+        });
+
+        // Package Selection
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPackage = card.getAttribute('data-size');
+            });
+        });
+
+        // Payment Selection
+        document.querySelectorAll('.payment-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPayment = card.getAttribute('data-method');
+
+                // Show/hide payment details
+                document.getElementById('ecocashDetails').classList.add('hidden');
+                document.getElementById('inbucksDetails').classList.add('hidden');
+
+                if (selectedPayment === 'ecocash') {
+                    document.getElementById('ecocashDetails').classList.remove('hidden');
+                } else if (selectedPayment === 'inbucks') {
+                    document.getElementById('inbucksDetails').classList.remove('hidden');
+                }
+            });
+        });
+
+        // Booking Flow
+        document.getElementById('nextStep1').addEventListener('click', () => {
+            const pickup = document.getElementById('pickupLocation').value;
+            const delivery = document.getElementById('deliveryLocation').value;
+
+            if (!pickup || !delivery) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            bookingData = {
+                pickup,
+                delivery,
+                package: selectedPackage,
+                payment: selectedPayment
+            };
+
+            // Update step indicators
+            document.getElementById('step1-indicator').classList.remove('active');
+            document.getElementById('step2-indicator').classList.add('active');
+
+            // Show step 2
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('progressFill').style.width = '66%';
+            currentBookingStep = 2;
+        });
+
+        document.getElementById('prevStep2').addEventListener('click', () => {
+            document.getElementById('step2-indicator').classList.remove('active');
+            document.getElementById('step1-indicator').classList.add('active');
+
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('progressFill').style.width = '33%';
+            currentBookingStep = 1;
+        });
+
+        document.getElementById('nextStep2').addEventListener('click', () => {
+            // Update review section
+            document.getElementById('reviewPickup').textContent = bookingData.pickup;
+            document.getElementById('reviewDelivery').textContent = bookingData.delivery;
+            document.getElementById('reviewPackage').textContent = bookingData.package.charAt(0).toUpperCase() + bookingData.package.slice(1);
+            
+            const paymentText = selectedPayment === 'ecocash' ? 'EcoCash' : 
+                              selectedPayment === 'inbucks' ? 'InBucks' : 'Cash';
+            document.getElementById('reviewPayment').textContent = paymentText;
+
+            // Calculate price
+            let price = 15.99;
+            if (selectedPackage === 'small') price = 8.99;
+            if (selectedPackage === 'large') price = 29.99;
+            document.getElementById('reviewAmount').textContent = `$${price.toFixed(2)}`;
+
+            // Update step indicators
+            document.getElementById('step2-indicator').classList.remove('active');
+            document.getElementById('step3-indicator').classList.add('active');
+
+            // Show step 3
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('progressFill').style.width = '100%';
+            currentBookingStep = 3;
+        });
+
+        document.getElementById('prevStep3').addEventListener('click', () => {
+            document.getElementById('step3-indicator').classList.remove('active');
+            document.getElementById('step2-indicator').classList.add('active');
+
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('progressFill').style.width = '66%';
+            currentBookingStep = 2;
+        });
+
+        document.getElementById('confirmBooking').addEventListener('click', () => {
+            const trackingNumber = 'SWIFT-' + Math.floor(100000 + Math.random() * 900000);
+            showAlert(`Delivery booked successfully! Tracking number: ${trackingNumber}`, 'success');
+            
+            // Reset booking flow
+            setTimeout(() => {
+                document.getElementById('step3-indicator').classList.remove('active');
+                document.getElementById('step1-indicator').classList.add('active');
+
+                document.getElementById('step3').classList.add('hidden');
+                document.getElementById('step1').classList.remove('hidden');
+                document.getElementById('progressFill').style.width = '33%';
+                currentBookingStep = 1;
+                
+                // Clear form
+                document.getElementById('pickupLocation').value = '';
+                document.getElementById('deliveryLocation').value = '';
+                
+                // Switch to tracking with new tracking number
+                document.getElementById('trackingNumber').value = trackingNumber;
+                switchSection('track');
+            }, 2000);
+        });
+
+        // Track Package
+        document.getElementById('trackBtn').addEventListener('click', () => {
+            const trackingNumber = document.getElementById('trackingNumber').value;
+            if (!trackingNumber) {
+                showAlert('Please enter a tracking number', 'error');
+                return;
+            }
+            showAlert(`Tracking package: ${trackingNumber}`, 'success');
+        });
+
+        // Accept Order Buttons
+        document.querySelectorAll('.accept-order').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orderCard = this.closest('.order-card');
+                const orderId = this.getAttribute('data-order');
+                showAlert(`Order ${orderId} accepted successfully!`, 'success');
+                
+                // Update button state
+                this.innerHTML = '<i class="fas fa-check"></i> Accepted';
+                this.disabled = true;
+                this.classList.remove('btn-success');
+                this.classList.add('btn-outline');
+            });
+        });
+
+        // Patterned Alert System
+        function showAlert(message, type) {
+            const title = type === 'success' ? 'Success' : 'Error';
+            const icon = type === 'success' ? 'fa-check' : 'fa-exclamation-circle';
+            
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `
+                <div class="alert-pattern"></div>
+                <div class="alert-icon">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="alert-content">
+                    <strong id="alertTitle">${title}</strong>
+                    <p id="alertMessage">${message}</p>
+                </div>
+            `;
+            
+            alert.classList.remove('hidden');
+            alert.classList.add('show');
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // Footer visibility on scroll
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Show/hide scroll to top button
+            if (scrollTop > 500) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+            
+            // Show footer when near bottom
+            if (scrollTop + windowHeight >= documentHeight - 100) {
+                appFooter.classList.add('visible');
+            } else if (scrollTop < lastScrollTop) {
+                appFooter.classList.remove('visible');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Scroll to top
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // Initialize with home section
+            switchSection('home');
+            
+            // Add smooth scrolling to all links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
